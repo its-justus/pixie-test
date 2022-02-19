@@ -13,7 +13,7 @@ PixieTest is a easy to use web application for operating and managing video game
 
 ## Dependencies
 
-PostgreSQL
+PostgreSQL 14+
 
 ## Installation
 
