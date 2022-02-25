@@ -1,8 +1,23 @@
-use warp::Filter;
+use std::net::SocketAddr;
+
+use axum::{routing::{get},
+	http::StatusCode,
+	response::IntoResponse,
+	Json, Router,};
 
 #[tokio::main]
 async fn main() {
-	let index = warp::path::end().and(warp::fs::dir("web/static"));
+	let app = Router::new()
+		.route("/", get(root));
+	
+	let addr = SocketAddr::from(([127,0,0,1], 3000));
+	println!("listening on {}", addr);
+	axum::Server::bind(&addr)
+		.serve(app.into_make_service())
+		.await
+		.unwrap();
+}
 
-	warp::serve(index).run(([127, 0, 0, 1], 3030)).await;
+async fn root() -> &'static str{
+	"Hello, world!"
 }
