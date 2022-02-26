@@ -3,11 +3,11 @@ import axios from "axios";
 
 
 function CreateCampaign() {
-	const {name, setName} = useState("");
-	const {testers, setTesters} = useState(0);
+	const [name, setName] = useState("");
+	const [testers, setTesters] = useState(0);
 
 	function submitCampaign() {
-		axios.post("localhost:3030", {name: name, testers: testers})
+		axios.post("localhost:3000", {name: name, testers: testers})
 	}
 	
 	return (
@@ -18,3 +18,5 @@ function CreateCampaign() {
 		</div>
 	)
 }
+
+export default CreateCampaign;
