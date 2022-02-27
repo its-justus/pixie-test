@@ -7,7 +7,16 @@ function CreateCampaign() {
 	const [testers, setTesters] = useState(0);
 
 	function submitCampaign() {
-		axios.post("localhost:3000", {name: name, testers: testers})
+		const config = {
+			headers: { "Content-Type": "application/json" },
+		};
+		axios.post(
+			"http://localhost:9001/campaign", 
+			{name: name, testers: Number(testers)},
+			config)
+			.then((res) => {
+				console.log(res);
+			});
 	}
 	
 	return (

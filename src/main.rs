@@ -22,6 +22,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(root))
         .route("/register", post(register))
+        .route("/campaign", post(create_campaign))
         .layer(cors_layer);
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 9001));
@@ -45,6 +46,15 @@ async fn register(Json(payload): Json<CreateUser>) -> impl IntoResponse {
     (StatusCode::CREATED, Json(user))
 }
 
+async fn create_campaign(Json(payload): Json<CreateCampaign>) -> impl IntoResponse {
+    let campaign = Campaign {
+        id: 420,
+        name: payload.name,
+        testers: payload.testers,
+    };
+    (StatusCode::CREATED, Json(campaign))
+}
+
 #[derive(Deserialize)]
 struct CreateUser {
     username: String,
@@ -54,4 +64,17 @@ struct CreateUser {
 struct User {
     id: usize,
     username: String,
+}
+
+#[derive(Deserialize)]
+struct CreateCampaign {
+    name: String,
+    testers: usize,
+}
+
+#[derive(Serialize)]
+struct Campaign {
+    id: usize,
+    name: String,
+    testers: usize,
 }
