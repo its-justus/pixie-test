@@ -47,14 +47,6 @@ async fn register(Json(payload): Json<CreateUser>) -> impl IntoResponse {
     (StatusCode::CREATED, Json(user))
 }
 
-async fn register_metamask(Json(payload): Json<CreateUser>) -> impl IntoResponse {
-    let user = User {
-        id: 42,
-        username: payload.username,
-    };
-    (StatusCode::CREATED, Json(user))
-}
-
 async fn create_campaign(Json(payload): Json<CreateCampaign>) -> impl IntoResponse {
     let campaign = Campaign {
         id: 420,
