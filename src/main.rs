@@ -38,7 +38,16 @@ async fn root() -> &'static str {
     "Hello, world!"
 }
 
+// TODO: add Discord OAuth2 support
 async fn register(Json(payload): Json<CreateUser>) -> impl IntoResponse {
+    let user = User {
+        id: 42,
+        username: payload.username,
+    };
+    (StatusCode::CREATED, Json(user))
+}
+
+async fn register_metamask(Json(payload): Json<CreateUser>) -> impl IntoResponse {
     let user = User {
         id: 42,
         username: payload.username,

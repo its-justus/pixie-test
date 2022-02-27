@@ -2,7 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import CreateCampaign from './components/CreateCampaign/CreateCampaign'
 import Register from './components/Register/Register';
-import MetaMaskAuth from './components/MetaMaskAuth/MetaMaskAuth';
+import MetaMaskAuth from './components/MetaMask/MetaMaskAuth/MetaMaskAuth';
 
 function onAddressChanged(newAddress) {
 	console.log(newAddress);
