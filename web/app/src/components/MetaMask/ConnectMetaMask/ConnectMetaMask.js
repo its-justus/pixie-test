@@ -1,6 +1,7 @@
 import React from "react";
 
 async function connect(onConnected){
+	// connects app to MetaMask and gets the currently selected account
 	if (!window.ethereum) {
 		alert("Get MetaMask!");
 		return;
