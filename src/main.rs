@@ -14,17 +14,20 @@ use tower_http::cors::{Any, CorsLayer, Origin};
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    // creates cors policy
     let cors_layer = CorsLayer::new()
         .allow_methods(vec![Method::PUT, Method::GET, Method::POST])
         .allow_origin(Origin::exact("http://localhost:3000".parse().unwrap()))
         .allow_headers(Any);
 
+    // creates router application and registers route handlers
     let app = Router::new()
         .route("/", get(root))
         .route("/register", post(register))
         .route("/campaign", post(create_campaign))
         .layer(cors_layer);
 
+    // binds app to a socket and starts the application
     let addr = SocketAddr::from(([127, 0, 0, 1], 9001));
     tracing::debug!("listening on {}", &addr);
     println!("Listening on {}", &addr);
@@ -40,6 +43,7 @@ async fn root() -> &'static str {
 
 // TODO: add Discord OAuth2 support
 async fn register(Json(payload): Json<CreateUser>) -> impl IntoResponse {
+    // uses serde_json to deserialize the request payload and returns a json response
     let user = User {
         id: 42,
         username: payload.username,
