@@ -1,22 +1,30 @@
 use std::net::SocketAddr;
 
 use axum::{
+    http::Method,
     http::StatusCode,
     response::IntoResponse,
     routing::{get, post},
     Json, Router,
 };
 use serde::{Deserialize, Serialize};
+use tower_http::cors::{Any, CorsLayer, Origin};
 
 #[tokio::main]
 async fn main() {
     tracing_subscriber::fmt::init();
 
+    let cors_layer = CorsLayer::new()
+        .allow_methods(vec![Method::PUT, Method::GET, Method::POST])
+        .allow_origin(Origin::exact("http://localhost:3000".parse().unwrap()))
+        .allow_headers(Any);
+
     let app = Router::new()
         .route("/", get(root))
-        .route("/register", post(register));
+        .route("/register", post(register))
+        .layer(cors_layer);
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([127, 0, 0, 1], 9001));
     tracing::debug!("listening on {}", &addr);
     println!("Listening on {}", &addr);
     axum::Server::bind(&addr)
