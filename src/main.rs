@@ -1,7 +1,7 @@
+use async_trait::async_trait;
 use std::net::SocketAddr;
 
 use axum::{
-    async_trait,
     extract::{Extension, FromRequest, RequestParts},
     http::Method,
     http::StatusCode,
@@ -26,7 +26,7 @@ async fn main() {
 
     // setup postgres connection manager
     let manager =
-        PostgresConnectionManager::new_from_stringlike("hostname=localhost user=pixietest", NoTls)
+        PostgresConnectionManager::new_from_stringlike("host=localhost user=pixietest", NoTls)
             .unwrap();
     let pool = Pool::builder().build(manager).await.unwrap();
 
@@ -74,7 +74,17 @@ async fn register(
         )
         .await
         .map_err(internal_error)?;
-    row.try_get::<usize, User>(0).map_err(internal_error)
+    let user = User {
+        id: row.try_get("id").map_err(internal_error)?,
+        username: row.try_get("name").map_err(internal_error)?,
+    };
+
+    (StatusCode::CREATED, Json(user))
+    // let user = User{
+    //     id: row.try_get::<&str, String>("name").map_err(internal_error)?,
+    //     username: row.try_get::<&str, String>("name").map_err(internal_error)?
+    // }
+
     /*
     Need to figure out how to get the row to go into the User type.
     not sure how to do this, but I assume it's possible
@@ -90,14 +100,36 @@ async fn create_campaign(Json(payload): Json<CreateCampaign>) -> impl IntoRespon
     (StatusCode::CREATED, Json(campaign))
 }
 
+#[async_trait]
+trait Creates<T> {
+    async fn try_create(&self, pool: ConnectionPool) -> Result<T, Error>;
+}
+
 #[derive(Deserialize)]
 struct CreateUser {
     username: String,
 }
 
+#[async_trait]
+impl Creates<User> for CreateUser {
+    async fn try_create(self, pool: ConnectionPool) -> Result<User, Error> {
+        let conn = pool.get().await.map_err(internal_error)?;
+        conn.query_one(
+            "insert into users (name) values ($1) returning id, name",
+            &[&self.username],
+        )
+        .await
+        .map(|row| User {
+            id: row.get("id"),
+            username: row.get("name"),
+        })
+        .map_err(internal_error)
+    }
+}
+
 #[derive(Serialize)]
 struct User {
-    id: usize,
+    id: uuid::Uuid,
     username: String,
 }
 
@@ -116,9 +148,9 @@ struct Campaign {
 
 /// Utility function for mapping any error into a `500 Internal Server Error`
 /// response.
-fn internal_error<E>(err: E) -> (StatusCode, String)
+fn internal_error<E>(err: E) -> String
 where
     E: std::error::Error,
 {
-    (StatusCode::INTERNAL_SERVER_ERROR, err.to_string())
+    String::from("Error saving to database")
 }
