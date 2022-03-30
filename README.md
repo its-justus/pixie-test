@@ -2,6 +2,8 @@
 
 PixieTest is a easy to use web application for operating and managing video game play tests.
 
+* PixieTest is still very early in development. Features and APIs are unstable and subject to change.
+
 ## Key Features
 
 - Candidate Self Registration and Invitations
